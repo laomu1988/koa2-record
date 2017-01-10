@@ -1,0 +1,33 @@
+{
+  "name": "koa2-record",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/record.js",
+  "scripts": {
+    "test": "mocha",
+    "push": "nrm use npm && npm version patch && npm publish && nrm use taobao",
+    "babel": "babel src -d  lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/laomu1988/koa2-remote.git",
+    "babel": "babel src -d  lib"
+  },
+  "bugs": {
+    "url": "https://github.com/laomu1988/koa2-remote/issues"
+  },
+  "author": "laomu1988@qq.com",
+  "license": "MIT",
+  "dependencies": {
+    "babel-core": "^6.10.4",
+    "babel-polyfill": "^6.9.1",
+    "babel-runtime": "^6.9.1",
+    "mk-dir": "^1.0.0"
+  },
+  "devDependencies": {
+    "koa": "^2.0.0-alpha.7",
+    "babel-eslint": "^5.0.0",
+    "babel-plugin-transform-async-to-generator": "^6.0.14",
+    "babel-plugin-transform-runtime": "^6.15.0"
+  }
+}
