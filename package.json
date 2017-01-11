@@ -10,8 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/laomu1988/koa2-remote.git",
-    "babel": "babel src -d  lib"
+    "url": "https://github.com/laomu1988/koa2-remote.git"
   },
   "bugs": {
     "url": "https://github.com/laomu1988/koa2-remote/issues"

@@ -3,6 +3,7 @@
  **/
 require("babel-core/register");
 require("babel-polyfill");
+var filter = require('filter-files');
 var fs = require('fs');
 var readFile = Promisify(fs.readFile, fs);
 var writeFile = Promisify(fs.writeFile, fs);
@@ -10,21 +11,28 @@ var path = require('path');
 var mkdir = require('mk-dir');
 
 
-var dir = path.dirname(require.main.filename) + '/record/';
+var dir = './koa2_record_data/';
 var count = 10000;
 
 /**
  * 配置
  * */
 module.exports.config = function (_dir) {
-  dir = path.resolve(path.dirname(require.main.filename), _dir);
+  dir = _dir;
+  mkdir(dir);
 };
 
 /**
  * 清除记录的数据
  * */
 module.exports.clean = function () {
-
+  if (!fs.existsSync(dir)) {
+    return false;
+  }
+  var files = filter.sync(dir) || [];
+  for (var i = 0; i < files.length; i++) {
+    fs.unlinkSync(files[i]);
+  }
 };
 
 /**
@@ -55,7 +63,7 @@ module.exports.getInfo = function (id, callback) {
  * koa使用的记录数据中间件
  * */
 module.exports.callback = function (callback) {
-  mkdir(path.dirname(dir));
+  mkdir(dir);
   return async function (ctx, next) {
     console.log('start:', ctx.url);
     count += 1;
