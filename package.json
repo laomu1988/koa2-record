@@ -21,7 +21,7 @@
     "babel-core": "^6.10.4",
     "babel-polyfill": "^6.9.1",
     "babel-runtime": "^6.9.1",
-    "mk-dir": "^1.0.0"
+    "mk-dir": "^1.0.1"
   },
   "devDependencies": {
     "koa": "^2.0.0-alpha.7",

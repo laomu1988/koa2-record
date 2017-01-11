@@ -15,7 +15,7 @@ var dir = './koa2_record_data/';
 var count = 10000;
 
 /**
- * 配置
+ * 配置文件存放目录
  * */
 module.exports.config = function (_dir) {
   dir = _dir;
@@ -39,23 +39,40 @@ module.exports.clean = function () {
  * 取得所有文件列表
  * */
 module.exports.getList = function () {
-
+  var list = filter.sync(dir);
+  return list.filter(file=> {
+    return path.extname(file) === '.json'
+  }).map(file => {
+    return path.parse(file).name;
+  }).sort(function (a, b) {
+    return parseInt(a.substr(a.lastIndexOf('-') + 1)) - parseInt(b.substr(b.lastIndexOf('-') + 1));
+  });
 };
 
 /**
- * 取得文件
+ * 取得文件信息
  */
 module.exports.getInfo = function (id, callback) {
-  var info = null, body = null;
-  return readFile(dir + '/' + id + '.json').then(function (data) {
-    info = JSON.stringify(data);
-    if (info.response) {
-      return readFile(dir + '/' + id + '-response-body.data', info.response.bodyType === 'string' ? 'utf8' : {});
-    }
-  }).then(function (data) {
-
-  }, function () {
-
+  var info = null;
+  return readFile(dir + '/' + id + '.json', 'utf8').then(function (data) {
+    info = JSON.parse(data);
+    (typeof callback === 'function') && callback(null, info);
+    return info;
+  }, function (err) {
+    (typeof callback === 'function') && callback(err);
+    throw err;
+  });
+};
+/**
+ * 取得相应body数据
+ */
+module.exports.getBody = function (id, callback) {
+  return readFile(dir + '/' + id + '-response-body.data').then(function (data) {
+    (typeof callback === 'function') && callback(null, data);
+    return data;
+  }, function (err) {
+    (typeof callback === 'function') && callback(err);
+    throw err;
   });
 };
 
@@ -83,10 +100,10 @@ module.exports.callback = function (callback) {
       info.request.body = req.body;
     }
     ctx.record_info = info;
-    typeof callback === 'function' && callback(ctx, info);
-    console.log('before:', ctx.url);
+    (typeof callback === 'function') && callback(ctx, info);
+    // console.log('before:', ctx.url);
     await next();
-    console.log('after:', ctx.url);
+    // console.log('after:', ctx.url);
     var res = ctx.response;
     info.endTime = Date.now();
     info.response = {
@@ -95,7 +112,7 @@ module.exports.callback = function (callback) {
       header: res.header,
       bodyType: typeof res.body
     };
-    typeof callback === 'function' && callback(ctx, info);
+    (typeof callback === 'function') && callback(ctx, info);
     writeFile(dir + id + '.json', JSON.stringify(info, null, '    '), 'utf8').then(function () {
       if (typeof ctx.response.body == 'string') {
         return writeFile(dir + id + '-response-body.data', ctx.response.body, 'utf8');
