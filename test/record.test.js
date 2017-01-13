@@ -5,7 +5,7 @@ var remote = require('koa2-remote');
 record.config(__dirname + '/record/');
 
 // 清空记录
-// record.clean();
+record.clean();
 
 function onRecord(ctx, info) {
   console.log('req:', ctx.request.url);

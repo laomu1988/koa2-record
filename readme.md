@@ -31,8 +31,35 @@ app.listen(3000, function (err) {
 ```
 
 
+
+## api
+* `config(dir)`  配置记录存放目录
+* `config({dir, callback})` 配置存放目录和有记录时的回调地址
+* `clean()`      清空记录数据
+* `callback(onRecord)` 生成koa@next的中间件,当有新的请求或者响应返回时调用onRecord
+* `getInfo(record_id,[callback])` 获取记录的详细情况,返回promise 
+* `getBody(record_id,[encode],[callback])` 获取记录的返回数据,返回promise 
+* `getList()`    文件夹内获取所有的记录id
+
+## info介绍
+    onRecord和config配置中的callback触发时将有两个参数,ctx和info,其中ctx为koa@next中的ctx对象,info部分数据和ctx保持一致,info对象有如下属性
+    
+- record_id: 记录id
+- startTime: 请求开始时间
+- endTime: 请求结束时间
+- request: 请求内容
+    - url
+    - host
+    - protocol
+    - header
+    - body
+- response  响应内容(请求阶段时未定义)
+    - status
+    - statusString
+    - header
+
 ## todo
 * [x] 清理数据
 * [x] 请求内容是否被修改过
-* [ ] api列表
+* [ ] 响应的body类型
 * [ ] 获取列表

@@ -1,7 +1,7 @@
 /**
  * 记录网路请求到本地
  **/
-require("babel-core/register");
+// require("babel-core/register");
 require("babel-polyfill");
 var filter = require('filter-files');
 var fs = require('fs');
@@ -9,17 +9,31 @@ var readFile = Promisify(fs.readFile, fs);
 var writeFile = Promisify(fs.writeFile, fs);
 var path = require('path');
 var mkdir = require('mk-dir');
+var _ = require('lodash');
 
 
 var dir = './koa2_record_data/';
+var onRecord = function () {
+};
 var count = 10000;
+
 
 /**
  * 配置文件存放目录
  * */
 module.exports.config = function (_dir) {
-  dir = _dir;
-  mkdir(dir);
+  if (typeof _dir === 'string') {
+    dir = _dir;
+    mkdir(dir);
+  } else if (_.isPlainObject(_dir)) {
+    if (typeof _dir.dir === 'string') {
+      dir = _dir;
+      mkdir(dir);
+    }
+    if (typeof _dir.callback === 'function') {
+      onRecord = _dir.callback;
+    }
+  }
 };
 
 /**
@@ -66,8 +80,12 @@ module.exports.getInfo = function (id, callback) {
 /**
  * 取得相应body数据
  */
-module.exports.getBody = function (id, callback) {
-  return readFile(dir + '/' + id + '-response-body.data').then(function (data) {
+module.exports.getBody = function (id, encode, callback) {
+  if (typeof encode === 'function') {
+    callback = encode;
+    encode = undefined;
+  }
+  return readFile(dir + '/' + id + '-response-body.data', encode).then(function (data) {
     (typeof callback === 'function') && callback(null, data);
     return data;
   }, function (err) {
@@ -93,13 +111,14 @@ module.exports.callback = function (callback) {
         url: req.url,
         host: req.host,
         protocol: req.protocol,
-        header: req.header
+        header: _.clone(req.header)
       }
     };
     if (req.body) {
       info.request.body = req.body;
     }
     ctx.record_info = info;
+    onRecord(ctx, info);
     (typeof callback === 'function') && callback(ctx, info);
     // console.log('before:', ctx.url);
     await next();
@@ -107,24 +126,40 @@ module.exports.callback = function (callback) {
     var res = ctx.response;
     info.endTime = Date.now();
     info.response = {
-      statusCode: res.status,
+      status: res.status,
       statusString: res.statusString,
-      header: res.header,
-      bodyType: typeof res.body
+      header: res.header
     };
+    var infoReq = info.request;
+    var changed = {};
+    if (infoReq.url != req.url)  changed.url = req.url;
+    if (infoReq.host != req.host)  changed.host = req.host;
+    if (infoReq.protocol != req.protocol)  changed.protocol = req.protocol;
+    if (JSON.stringify(infoReq.header) !== JSON.stringify(req.header)) {
+      var header = req.header;
+      var oldHeader = infoReq.header;
+      var changedHeader = {}, attrs = {};
+      for (var attr in header) {
+        attrs[attr] = true;
+        if (header[attr] !== oldHeader[attr]) {
+          changedHeader[attr] = header[attr];
+        }
+      }
+      for (var attr2 in oldHeader) {
+        if (!attrs[attr2]) changedHeader[attr2] = '';
+      }
+      changed.header = changedHeader;
+    }
+    if (JSON.stringify(changed).length > 3) {
+      info.changed = changed;
+    }
+    onRecord(ctx, info);
     (typeof callback === 'function') && callback(ctx, info);
     writeFile(dir + id + '.json', JSON.stringify(info, null, '    '), 'utf8').then(function () {
-      if (typeof ctx.response.body == 'string') {
-        return writeFile(dir + id + '-response-body.data', ctx.response.body, 'utf8');
-      } else {
-        return writeFile(dir + id + '-response-body.data', ctx.response.body);
-      }
-    }).then(function (data, err) {
-      if (err) throw err;
-      return data;
+      return writeFile(dir + id + '-response-body.data', ctx.response.body);
     }).catch(function (err) {
-      console.log(err);
-    })
+      console.error(err);
+    });
   }
 };
 
@@ -137,8 +172,12 @@ function Promisify(func, obj) {
         if (err) return reject(err);
         resolve(data);
       });
-      // console.log('argus:', args);
-      func.apply(obj, args);
+      try {
+        func.apply(obj, args);
+      }
+      catch (e) {
+        reject(e);
+      }
     });
   }
 }

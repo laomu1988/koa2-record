@@ -18,12 +18,14 @@
   "author": "laomu1988@qq.com",
   "license": "MIT",
   "dependencies": {
-    "babel-core": "^6.10.4",
     "babel-polyfill": "^6.9.1",
-    "babel-runtime": "^6.9.1",
+    "lodash": "^4.17.4",
     "mk-dir": "^1.0.1"
   },
   "devDependencies": {
+    "babel-core": "^6.10.4",
+    "babel-runtime": "^6.9.1",
+    "koa2-remote": "^1.0.2",
     "koa": "^2.0.0-alpha.7",
     "babel-eslint": "^5.0.0",
     "babel-plugin-transform-async-to-generator": "^6.0.14",
