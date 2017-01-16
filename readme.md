@@ -39,7 +39,10 @@ app.listen(3000, function (err) {
 * `callback(onRecord)` 生成koa@next的中间件,当有新的请求或者响应返回时调用onRecord
 * `getInfo(record_id,[callback])` 获取记录的详细情况,返回promise 
 * `getBody(record_id,[encode],[callback])` 获取记录的返回数据,返回promise 
+* `getPath(record_id)` 获取记录信息位置和body存放路径,返回{info:'info_path',body: 'body_path'}
 * `getList()`    文件夹内获取所有的记录id
+
+
 
 ## info介绍
     onRecord和config配置中的callback触发时将有两个参数,ctx和info,其中ctx为koa@next中的ctx对象,info部分数据和ctx保持一致,info对象有如下属性
@@ -61,5 +64,15 @@ app.listen(3000, function (err) {
 ## todo
 * [x] 清理数据
 * [x] 请求内容是否被修改过
-* [ ] 响应的body类型
-* [ ] 获取列表
+* [x] 响应的body类型
+* [x] 获取列表
+
+
+## history
+- v1.0.2
+    * 增加getPath,获取存放info和response body的路径
+- v1.0.1
+    * 清理文件clean
+    * getBody增加参数编码getBody(record_id,[encode],[callback])
+- v1.0.0
+    * 记录请求

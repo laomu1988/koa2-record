@@ -3,6 +3,7 @@
  **/
 // require("babel-core/register");
 require("babel-polyfill");
+const bodyAppend = '-response-body.data';
 var filter = require('filter-files');
 var fs = require('fs');
 var readFile = Promisify(fs.readFile, fs);
@@ -13,6 +14,7 @@ var _ = require('lodash');
 
 
 var dir = './koa2_record_data/';
+
 var onRecord = function () {
 };
 var count = 10000;
@@ -85,7 +87,7 @@ module.exports.getBody = function (id, encode, callback) {
     callback = encode;
     encode = undefined;
   }
-  return readFile(dir + '/' + id + '-response-body.data', encode).then(function (data) {
+  return readFile(dir + '/' + id + bodyAppend, encode).then(function (data) {
     (typeof callback === 'function') && callback(null, data);
     return data;
   }, function (err) {
@@ -94,13 +96,19 @@ module.exports.getBody = function (id, encode, callback) {
   });
 };
 
+module.exports.getPath = function (id) {
+  return {
+    info: dir + id + '.json',
+    body: dir + id + bodyAppend
+  }
+};
 /**
  * koa使用的记录数据中间件
  * */
 module.exports.callback = function (callback) {
   mkdir(dir);
   return async function (ctx, next) {
-    console.log('start:', ctx.url);
+    // console.log('start:', ctx.url);
     count += 1;
     var req = ctx.request;
     var id = req.host.replace(/[\/\\:\.]/g, '_') + '_' + count + '-' + Date.now();
@@ -156,7 +164,7 @@ module.exports.callback = function (callback) {
     onRecord(ctx, info);
     (typeof callback === 'function') && callback(ctx, info);
     writeFile(dir + id + '.json', JSON.stringify(info, null, '    '), 'utf8').then(function () {
-      return writeFile(dir + id + '-response-body.data', ctx.response.body);
+      return writeFile(dir + id + bodyAppend, ctx.response.body);
     }).catch(function (err) {
       console.error(err);
     });
