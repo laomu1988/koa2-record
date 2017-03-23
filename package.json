@@ -5,15 +5,15 @@
   "main": "lib/record.js",
   "scripts": {
     "test": "mocha",
-    "push": "nrm use npm && npm version patch && npm publish && nrm use taobao",
+    "push": "nrm use npm && npm version patch && npm publish",
     "babel": "babel src -d  lib"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/laomu1988/koa2-remote.git"
+    "url": "https://github.com/laomu1988/koa2-record.git"
   },
   "bugs": {
-    "url": "https://github.com/laomu1988/koa2-remote/issues"
+    "url": "https://github.com/laomu1988/koa2-record/issues"
   },
   "author": "laomu1988@qq.com",
   "license": "MIT",

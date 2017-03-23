@@ -113,11 +113,12 @@ module.exports.callback = function (callback) {
     var req = ctx.request;
     var id = req.host.replace(/[\/\\:\.]/g, '_') + '_' + count + '-' + Date.now();
     var info = {
-      record_id: id,
+      id: id,
       startTime: Date.now(),
       request: {
         url: req.url,
         host: req.host,
+        method: req.method,
         protocol: req.protocol,
         header: _.clone(req.header)
       }
@@ -142,6 +143,7 @@ module.exports.callback = function (callback) {
     var changed = {};
     if (infoReq.url != req.url)  changed.url = req.url;
     if (infoReq.host != req.host)  changed.host = req.host;
+    if (infoReq.method != req.method)  changed.method = req.method;
     if (infoReq.protocol != req.protocol)  changed.protocol = req.protocol;
     if (JSON.stringify(infoReq.header) !== JSON.stringify(req.header)) {
       var header = req.header;
