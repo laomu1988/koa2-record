@@ -117,7 +117,6 @@ module.exports.callback = function (callback) {
       startTime: Date.now(),
       request: {
         url: req.url,
-        host: req.host,
         method: req.method,
         protocol: req.protocol,
         header: _.clone(req.header)
@@ -142,9 +141,9 @@ module.exports.callback = function (callback) {
     var infoReq = info.request;
     var changed = {};
     if (infoReq.url != req.url)  changed.url = req.url;
-    if (infoReq.host != req.host)  changed.host = req.host;
     if (infoReq.method != req.method)  changed.method = req.method;
     if (infoReq.protocol != req.protocol)  changed.protocol = req.protocol;
+    if (ctx.remote) changed.remote = ctx.remote;
     if (JSON.stringify(infoReq.header) !== JSON.stringify(req.header)) {
       var header = req.header;
       var oldHeader = infoReq.header;

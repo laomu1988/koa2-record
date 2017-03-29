@@ -70,6 +70,8 @@ app.listen(3000, function (err) {
 
 
 ## history
+- v1.0.4
+    * 删除changed.host,增加changed.remote
 - v1.0.3
     * 增加method,record_id修改为id
 - v1.0.2
